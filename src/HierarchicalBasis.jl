@@ -1,3 +1,7 @@
+#---------------------------------------------------------------
+# Construct basis function and collocation points
+#---------------------------------------------------------------
+
 function basis(l::Int, j::Int, x::Float64)::Float64
     """
     We set up conventions for hierarchical basis functions here.  Levels go
@@ -25,6 +29,10 @@ function x(l::Int, j::Int)::Float64
     return h*j
 end
 
+#---------------------------------------------------------------
+# Construct types
+#---------------------------------------------------------------
+
 struct Level{T}
     values::Array{T,1}
 end
@@ -37,11 +45,15 @@ struct NodalBasis{T}
     values::Array{T,1}
 end
 
+#---------------------------------------------------------------
+# Construct indexing utilities
+#---------------------------------------------------------------
+
 function maxlevel(HB::HierarchicalBasis{T})::Int where {T}
     return length(H.levels) - 1
 end
 
-function maxlevel(NB::HierarchicalBasis{T})::Int where {T}
+function maxlevel(NB::NodalBasis{T})::Int where {T}
     return log2(length(NB.values) - 1)
 end
 
@@ -67,6 +79,10 @@ function Base.setindex!(NB::NodalBasis{T}, X::T, j::Int)::T where {T}
     NB.values[j+1] = X
 end
 
+#---------------------------------------------------------------
+# Construct basis transformation utilities
+#---------------------------------------------------------------
+
 function evaluate(HB::HierarchicalBasis{T}, x::T)::T where {T}
     value = HB[0, 0]*basis(0, 0, x) + HB[0, 1]*basis(0, 1, x) 
     for l in 1:maxlevel(HB), j in 1:2:2^l
@@ -84,14 +100,13 @@ function Base. zeros(NB::NodalBasis{T})::HierarchicalBasis{T} where {T}
 end
 
 function Base. zeros(HB::HierarchicalBasis{T})::NodalBasis{T} where {T}
-    return NodalBasis(zeros(T, maxlevel(HB)^2 + 1))
+    return NodalBasis(zeros(T, 2^maxlevel(HB) + 1))
 end
-
 
 function NB_2_HB(NB::NodalBasis{T})::HierarchicalBasis{T} where {T}
     HB = zeros(NB)
-    HB[0,1] = NB[1]
-    HB[0,2] = NB[end]
+    HB[0,0] = NB[0]
+    HB[0,1] = NB[end]
     for l in 1:maxlevel(NB), j in 1:2:2^l
         HB[l,j] = NB[j] - evaluate(HB, x(l,j))  
     end
@@ -100,10 +115,9 @@ end
 
 function HB_2_NB(NB::HierarchicalBasis{T})::NodalBasis{T} where {T}
     NB = zeros(HB)
-    NB[0,1]   = HB[0,1]
-    NB[0,end] = HB[0,2]
+    NB[0]   = HB[0,0]
+    NB[end] = HB[0,1]
     for j in 1:2^l - 1
-        xj    = (2^(-l))*j
         NB[j] = evaluate(HB, x(l,j))
     end
     return NB
