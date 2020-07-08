@@ -1,4 +1,9 @@
-module SparseGrids
+#-----------------------------------------------------
+# SparseGrids | Main
+# Soham 07/2020
+#-----------------------------------------------------
 
-include("LinearInterpolation.jl")
-end # module
+module SparseGrids
+    include("LinearInterpolation.jl")
+    include("HierarchicalBasis.jl")
+end
