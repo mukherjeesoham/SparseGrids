@@ -5,7 +5,7 @@
 
 using LinearAlgebra
 export Level, HierarchicalBasis, NodalBasis
-export NB_2_HB, HB_2_NB
+export NB_2_HB, HB_2_NB, levels
 
 #---------------------------------------------------------------
 # Construct basis function and collocation points
@@ -103,16 +103,16 @@ end
 #---------------------------------------------------------------
 
 function evaluate(HB::HierarchicalBasis{T}, x::T)::T where {T}
-    value = HB[0, 0]*basis(0, 0, x) + HB[0, 1]*basis(0, 1, x) 
-    for l in 1:levels(HB), j in 0:2^l
+    value = T(0) 
+    for l in 0:levels(HB), j in 0:2^l
         value = value + HB[l,j]*basis(l,j,x)
     end
     return value
 end
 
 function Base. zeros(NB::NodalBasis{T})::HierarchicalBasis{T} where {T}
-    HB = [Level(zeros(T,2))]
-    for l in 1:levels(NB)
+    HB = []
+    for l in 0:levels(NB)
         HB = vcat(HB, Level(zeros(T, 2^l + 1)))
     end
     return HierarchicalBasis{T}(HB)
@@ -124,9 +124,7 @@ end
 
 function NB_2_HB(NB::NodalBasis{T})::HierarchicalBasis{T} where {T}
     HB = zeros(NB)
-    HB[0,0] = NB[0]
-    HB[0,1] = NB[end]
-    for l in 1:levels(NB), j in 0:2^l
+    for l in 0:levels(NB), j in 0:2^l
         HB[l,j] = NB[l,j] - evaluate(HB, x(l,j))  
     end
     return HB
@@ -134,9 +132,7 @@ end
 
 function HB_2_NB(HB::HierarchicalBasis{T})::NodalBasis{T} where {T}
     NB = zeros(HB)
-    NB[0]   = HB[0,0]
-    NB[end] = HB[0,1]
-    for j in 1:2^levels(HB) - 1
+    for j in 0:2^levels(HB)
         NB[j] = evaluate(HB, x(levels(HB),j))
     end
     return NB
