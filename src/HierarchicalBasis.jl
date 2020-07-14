@@ -57,6 +57,7 @@ end
 
 #---------------------------------------------------------------
 # Construct indexing utilities
+# TODO: Current indexing routine stores a lot of zeros. Fix this. 
 #---------------------------------------------------------------
 
 function levels(HB::HierarchicalBasis{T})::Int where {T}
@@ -100,6 +101,8 @@ end
 
 #---------------------------------------------------------------
 # Construct basis transformation utilities
+# TODO: To go from a nodal to a modal routine, use a recursive linear
+# interpolation routine, to make things more efficient. 
 #---------------------------------------------------------------
 
 function evaluate(HB::HierarchicalBasis{T}, x::T)::T where {T}

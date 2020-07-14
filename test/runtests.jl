@@ -5,4 +5,4 @@
 
 using SparseGrids, Test
 
-include("HierarchicalBasisTest.jl")
+include("ArbitraryDimensionsTest.jl")

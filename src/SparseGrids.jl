@@ -5,5 +5,6 @@
 
 module SparseGrids
     include("LinearInterpolation.jl")
-    include("HierarchicalBasis.jl")
+    # include("HierarchicalBasis.jl")
+    include("ArbitraryDimensions.jl")
 end
