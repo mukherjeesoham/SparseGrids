@@ -32,7 +32,7 @@ function basis(l::Int, j::Int, x::T)::T where {T}
 	return value
 end
 
-function x(l::Int, j::Int)::Float64
+function x(::T, l::Int, j::Int)::T where {T}
 	@assert 0 <= l
 	@assert 0 <= j <= (2^l)
     h = 1/(2^l)
@@ -128,7 +128,7 @@ end
 function NB_2_HB(NB::NodalBasis{T})::HierarchicalBasis{T} where {T}
     HB = zeros(NB)
     for l in 0:levels(NB), j in 0:2^l
-        HB[l,j] = NB[l,j] - evaluate(HB, x(l,j))  
+        HB[l,j] = NB[l,j] - evaluate(HB, x(T,l,j))  
     end
     return HB
 end
@@ -136,7 +136,7 @@ end
 function HB_2_NB(HB::HierarchicalBasis{T})::NodalBasis{T} where {T}
     NB = zeros(HB)
     for j in 0:2^levels(HB)
-        NB[j] = evaluate(HB, x(levels(HB),j))
+        NB[j] = evaluate(HB, x(T,levels(HB),j))
     end
     return NB
 end

@@ -5,4 +5,4 @@
 
 using SparseGrids, Test
 
-include("ArbitraryDimensionsTest.jl")
+include("PlotGridTest.jl")
